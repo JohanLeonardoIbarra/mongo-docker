@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  mongo:
+    container_name: mongo
+    build: .
+    ports:
+      - "27017:27017"
+    networks:
+      - mongo
+
+networks:
+  mongo:
+    driver: bridge
