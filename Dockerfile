@@ -1,31 +1,20 @@
-FROM debian:bullseye-slim
+FROM fedora:38
 
 # Instala las dependencias necesarias
-RUN apt-get update && \
-    apt-get install -y \
-    gnupg wget && \
-    rm -rf /var/lib/apt/lists/*
+RUN dnf -y update && \
+    dnf -y install wget openssl systemd && \
+    dnf clean all
 
-# Importa la clave pública de MongoDB
-RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | gpg --import -
-
-# Añade la clave GPG del repositorio de MongoDB al sistema
-RUN gpg --export --armor B00A0BD1E2C63C11 | apt-key add -
-
-# Añade el repositorio de MongoDB
-RUN echo "deb http://repo.mongodb.org/apt/debian bullseye/mongodb-org/5.0 main" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-
-# Instala MongoDB
-RUN apt-get update && \
-    apt-get install -y mongodb-org && \
-    rm -rf /var/lib/apt/lists/*
+RUN wget https://repo.mongodb.org/yum/redhat/9/mongodb-org/7.0/x86_64/RPMS/mongodb-org-server-7.0.4-1.el9.x86_64.rpm && \
+    rpm -i mongodb-org-server-7.0.4-1.el9.x86_64.rpm && \
+    rm mongodb-org-server-7.0.4-1.el9.x86_64.rpm
 
 RUN sed -i "s|bindIp: 127.0.0.1|bindIp: 0.0.0.0 |g" /etc/mongod.conf
 
-# Configura el servicio de MongoDB
-VOLUME /data/db
+# Crea el directorio para almacenar los datos de MongoDB
+RUN mkdir -p /data/db
+
 EXPOSE 27017
 
-# Inicia MongoDB con el comando mongod
-CMD ["mongod"]
-
+# Configura el comando de inicio de MongoDB
+CMD ["mongod", "--bind_ip", "0.0.0.0"]

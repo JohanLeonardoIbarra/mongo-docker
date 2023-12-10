@@ -6,8 +6,21 @@ services:
     ports:
       - "27017:27017"
     networks:
+      - mongo-net
+
+  mongo-gui:
+    container_name: "mongo-gui"
+    image: ugleiton/mongo-gui
+    restart: always
+    ports:
+      - "4321:4321"
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+    depends_on:
       - mongo
+    networks:
+      - mongo-net
 
 networks:
-  mongo:
+  mongo-net:
     driver: bridge
