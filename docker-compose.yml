@@ -4,9 +4,11 @@ services:
     container_name: mongo
     build: .
     ports:
-      - "27017:27017"
+      - "27017:27020"
     networks:
       - mongo-net
+    volumes:
+      - ./data/:/data/db
 
   mongo-gui:
     container_name: "mongo-gui"
@@ -15,7 +17,7 @@ services:
     ports:
       - "4321:4321"
     environment:
-      MONGO_URL: mongodb://mongo:27017
+      MONGO_URL: mongodb://mongo:27020
     depends_on:
       - mongo
     networks:
